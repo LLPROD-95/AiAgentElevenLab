@@ -1,57 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Conversation Widget</title>
+    <!-- Les mêmes métadonnées et CSS que précédemment -->
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .container {
-            text-align: center;
-            background-color: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        #launchAI {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        #launchAI:hover {
-            background-color: #357abd;
-        }
+        /* Conserver les mêmes styles CSS */
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Lancez votre assistant IA</h2>
-        <button id="launchAI">Commencer la conversation</button>
+    <div class="chat-container">
+        <div class="chat-header">
+            Chat connecté à n8n
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="input-container">
+            <input type="text" id="message-input" placeholder="Tapez votre message...">
+            <button id="send-button" onclick="sendMessage()">Envoyer</button>
+        </div>
     </div>
 
-    <elevenlabs-convai agent-id="9zIrMUlk1wRddGqLC9zz" style="display:none;" id="aiWidget"></elevenlabs-convai>
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const N8N_WEBHOOK_URL = 'URL_DE_VOTRE_WEBHOOK_N8N'; // Remplacer par votre URL
+
+        async function sendMessageToN8N(message) {
+            try {
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                const data = await response.json();
+                return data.response;
+            } catch (error) {
+                console.error('Erreur:', error);
+                return "Désolé, le service est indisponible pour le moment.";
+            }
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                addMessage(message, true);
+                messageInput.value = '';
+                
+                // Appel à n8n
+                const botResponse = await sendMessageToN8N(message);
+                addMessage(botResponse, false);
+            }
+        }
+
+        // Même fonction addMessage() que précédemment
+        function addMessage(message, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Gestion de la touche Entrée
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        addMessage("Bonjour ! Je suis connecté à n8n. Comment puis-je vous aider ?", false);
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Intelligent</title>
+    <style>
+        /* Conserver les styles précédents */
+
+        /* Style pour le widget ConvAI */
+        #convai-widget {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        /* Bouton de déclenchement */
+        #widget-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        #widget-toggle:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+        }
+    </style>
+    <!-- Script ElevenLabs -->
     <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Conserver la structure de chat précédente -->
+    </div>
+
+    <!-- Widget ElevenLabs -->
+    <div id="convai-widget">
+        <elevenlabs-convai agent-id="xxxxxxxxxxxxxxxx"></elevenlabs-convai>
+    </div>
+
+    <!-- Bouton de contrôle -->
+    <button id="widget-toggle" onclick="toggleWidget()">🎙️</button>
 
     <script>
-        document.getElementById('launchAI').addEventListener('click', function() {
-            const widget = document.getElementById('aiWidget');
-            widget.style.display = 'block';
-            // Trigger widget launch (method may vary depending on Eleven Labs implementation)
-            widget.click();
-        });
+        // Fonction de basculement du widget
+        function toggleWidget() {
+            const widget = document.getElementById('convai-widget');
+            widget.style.display = widget.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Conserver les fonctions de chat précédentes
+        // ... (le reste du code JavaScript précédent)
     </script>
 </body>
 </html>
