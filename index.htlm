@@ -1,57 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Conversation Widget</title>
+    <title>Page avec Agent AI Eleven Labs</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #f4f4f9;
         }
         .container {
             text-align: center;
-            background-color: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        #launchAI {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 18px;
+            background: white;
+            padding: 20px;
             border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        #launchAI:hover {
-            background-color: #357abd;
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Lancez votre assistant IA</h2>
-        <button id="launchAI">Commencer la conversation</button>
+        <h1>Communiquez avec notre Agent IA</h1>
+        <!-- Modification pour éviter les problèmes de sécurité -->
+        <div id="ai-widget-container"></div>
+        <script>
+            // Chargement sécurisé du widget pour éviter les blocages
+            document.addEventListener("DOMContentLoaded", function () {
+                const container = document.getElementById('ai-widget-container');
+                const script = document.createElement('script');
+                script.src = "https://elevenlabs.io/convai-widget/index.js";
+                script.async = true;
+                script.type = "text/javascript";
+                script.onload = function () {
+                    const widget = document.createElement('elevenlabs-convai');
+                    widget.setAttribute('agent-id', '9zIrMUlk1wRddGqLC9zz');
+                    container.appendChild(widget);
+                };
+                document.body.appendChild(script);
+            });
+        </script>
     </div>
-
-    <elevenlabs-convai agent-id="9zIrMUlk1wRddGqLC9zz" style="display:none;" id="aiWidget"></elevenlabs-convai>
-    <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
-
-    <script>
-        document.getElementById('launchAI').addEventListener('click', function() {
-            const widget = document.getElementById('aiWidget');
-            widget.style.display = 'block';
-            // Trigger widget launch (method may vary depending on Eleven Labs implementation)
-            widget.click();
-        });
-    </script>
 </body>
 </html>
