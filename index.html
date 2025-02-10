@@ -1,91 +1,76 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <!-- Les mêmes métadonnées et CSS que précédemment -->
-    <style>
-        /* Conserver les mêmes styles CSS */
-    </style>
-</head>
-<body>
-    <div class="chat-container">
-        <div class="chat-header">
-            Chat connecté à n8n
-        </div>
-        <div class="chat-messages" id="chat-messages"></div>
-        <div class="input-container">
-            <input type="text" id="message-input" placeholder="Tapez votre message...">
-            <button id="send-button" onclick="sendMessage()">Envoyer</button>
-        </div>
-    </div>
-
-    <script>
-        const chatMessages = document.getElementById('chat-messages');
-        const messageInput = document.getElementById('message-input');
-        const N8N_WEBHOOK_URL = 'URL_DE_VOTRE_WEBHOOK_N8N'; // Remplacer par votre URL
-
-        async function sendMessageToN8N(message) {
-            try {
-                const response = await fetch(N8N_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        timestamp: new Date().toISOString()
-                    })
-                });
-                
-                const data = await response.json();
-                return data.response;
-            } catch (error) {
-                console.error('Erreur:', error);
-                return "Désolé, le service est indisponible pour le moment.";
-            }
-        }
-
-        async function sendMessage() {
-            const message = messageInput.value.trim();
-            
-            if (message) {
-                addMessage(message, true);
-                messageInput.value = '';
-                
-                // Appel à n8n
-                const botResponse = await sendMessageToN8N(message);
-                addMessage(botResponse, false);
-            }
-        }
-
-        // Même fonction addMessage() que précédemment
-        function addMessage(message, isUser) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-            messageDiv.textContent = message;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Gestion de la touche Entrée
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        addMessage("Bonjour ! Je suis connecté à n8n. Comment puis-je vous aider ?", false);
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Intelligent</title>
     <style>
-        /* Conserver les styles précédents */
+        /* Styles pour le chat */
+        .chat-container {
+            width: 300px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .message {
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .user-message {
+            background-color: #e1ffc7;
+            text-align: right;
+        }
+
+        .bot-message {
+            background-color: #ffffe0;
+            text-align: left;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 10px;
+        }
+
+        #message-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #send-button {
+            margin-left: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #send-button:hover {
+            background-color: #45a049;
+        }
 
         /* Style pour le widget ConvAI */
         #convai-widget {
@@ -127,7 +112,14 @@
 </head>
 <body>
     <div class="chat-container">
-        <!-- Conserver la structure de chat précédente -->
+        <div class="chat-header">
+            Chat connecté à n8n
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="input-container">
+            <input type="text" id="message-input" placeholder="Tapez votre message...">
+            <button id="send-button" onclick="sendMessage()">Envoyer</button>
+        </div>
     </div>
 
     <!-- Widget ElevenLabs -->
@@ -139,14 +131,65 @@
     <button id="widget-toggle" onclick="toggleWidget()">🎙️</button>
 
     <script>
-        // Fonction de basculement du widget
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const N8N_WEBHOOK_URL = 'URL_DE_VOTRE_WEBHOOK_N8N'; // Remplacer par votre URL
+
+        async function sendMessageToN8N(message) {
+            try {
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                const data = await response.json();
+                return data.response;
+            } catch (error) {
+                console.error('Erreur:', error);
+                return "Désolé, le service est indisponible pour le moment.";
+            }
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+
+            if (message) {
+                addMessage(message, true);
+                messageInput.value = '';
+
+                // Appel à n8n
+                const botResponse = await sendMessageToN8N(message);
+                addMessage(botResponse, false);
+            }
+        }
+
+        function addMessage(message, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        addMessage("Bonjour ! Je suis connecté à n8n. Comment puis-je vous aider ?", false);
+
         function toggleWidget() {
             const widget = document.getElementById('convai-widget');
             widget.style.display = widget.style.display === 'none' ? 'block' : 'none';
         }
-
-        // Conserver les fonctions de chat précédentes
-        // ... (le reste du code JavaScript précédent)
     </script>
 </body>
 </html>
