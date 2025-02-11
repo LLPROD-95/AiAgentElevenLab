@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Intelligent</title>
+    <title>Gwendy à l'écoute</title>
     <style>
         /* Styles pour le chat */
         body, html {
@@ -11,11 +11,12 @@
             padding: 0;
             height: 100%;
             font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
         }
 
         .chat-container {
             width: 95%;
-            height: 90%;
+            height: 85%;
             margin: auto;
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -23,10 +24,11 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background-color: #fff;
         }
 
         .chat-header {
-            background-color: #4CAF50;
+            background-color: #b04680; /* Rose */
             color: white;
             padding: 15px;
             text-align: center;
@@ -52,13 +54,13 @@
         }
 
         .user-message {
-            background-color: #e1ffc7;
+            background-color: #ffccf9; /* Rose clair */
             text-align: right;
             align-self: flex-end;
         }
 
         .bot-message {
-            background-color: #ffffe0;
+            background-color: #e6e6ff; /* Violet clair */
             text-align: left;
             align-self: flex-start;
         }
@@ -83,7 +85,7 @@
         #send-button {
             margin-left: 10px;
             padding: 15px;
-            background-color: #4CAF50;
+            background-color: #b04680; /* Rose */
             color: white;
             border: none;
             border-radius: 20px;
@@ -92,16 +94,42 @@
         }
 
         #send-button:hover {
-            background-color: #45a049;
+            background-color: #9a3f6e; /* Rose foncé */
         }
 
         /* Style pour le widget ConvAI */
         #convai-widget {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 80px;
+            left: 20px;
             z-index: 1000;
-            display: block;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        /* Bouton de déclenchement */
+        #widget-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #b04680; /* Rose */
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        #widget-toggle:hover {
+            background-color: #9a3f6e; /* Rose foncé */
+            transform: scale(1.1);
         }
     </style>
     <!-- Script ElevenLabs -->
@@ -110,7 +138,7 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            Chat connecté à n8n
+            Gwendy à l'écoute
         </div>
         <div class="chat-messages" id="chat-messages"></div>
         <div class="input-container">
@@ -123,6 +151,9 @@
     <div id="convai-widget">
         <elevenlabs-convai agent-id="9zIrMUlk1wRddGqLC9zz"></elevenlabs-convai>
     </div>
+
+    <!-- Bouton de contrôle -->
+    <button id="widget-toggle" onclick="toggleWidget()">🎙️</button>
 
     <script>
         const chatMessages = document.getElementById('chat-messages');
@@ -178,7 +209,12 @@
             }
         });
 
-        addMessage("Bonjour ! Je suis connecté à n8n. Comment puis-je vous aider ?", false);
+        addMessage("Bonjour ! Je suis Gwendy. Comment puis-je vous aider ?", false);
+
+        function toggleWidget() {
+            const widget = document.getElementById('convai-widget');
+            widget.style.display = widget.style.display === 'none' ? 'block' : 'none';
+        }
     </script>
 </body>
 </html>
