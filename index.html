@@ -183,13 +183,20 @@
 
         async function sendMessage() {
             const message = messageInput.value.trim();
-
             if (message) {
                 addMessage(message, true);
                 messageInput.value = '';
-
+                // Afficher le sablier d'attente
+                const loadingMessageElement = document.createElement('div');
+                loadingMessageElement.classList.add('message', 'bot-message');
+                loadingMessageElement.innerHTML = '⌛';
+                chatMessages.appendChild(loadingMessageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
                 // Appel à n8n
                 const botResponse = await sendMessageToN8N(message);
+                // Supprimer le sablier et afficher la réponse du bot
+                chatMessages.removeChild(loadingMessageElement);
                 addMessage(botResponse, false);
             }
         }
