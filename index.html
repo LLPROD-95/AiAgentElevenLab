@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gwendy à l'écoute</title>
     <style>
-        /* Styles pour le chat */
+        /* Styles for the chat */
         body, html {
             margin: 0;
             padding: 0;
@@ -28,7 +28,7 @@
         }
 
         .chat-header {
-            background-color: #b04680; /* Rose */
+            background-color: #b04680; /* Pink */
             color: white;
             padding: 15px;
             text-align: center;
@@ -54,13 +54,13 @@
         }
 
         .user-message {
-            background-color: #ffccf9; /* Rose clair */
+            background-color: #ffccf9; /* Light pink */
             text-align: right;
             align-self: flex-end;
         }
 
         .bot-message {
-            background-color: #e6e6ff; /* Violet clair */
+            background-color: #e6e6ff; /* Light blue */
             text-align: left;
             align-self: flex-start;
         }
@@ -85,7 +85,7 @@
         #send-button {
             margin-left: 10px;
             padding: 15px;
-            background-color: #b04680; /* Rose */
+            background-color: #b04680; /* Pink */
             color: white;
             border: none;
             border-radius: 20px;
@@ -94,10 +94,10 @@
         }
 
         #send-button:hover {
-            background-color: #9a3f6e; /* Rose foncé */
+            background-color: #9a3f6e; /* Dark pink */
         }
 
-        /* Style pour le widget ConvAI */
+        /* Style for the ConvAI widget */
         #convai-widget {
             position: fixed;
             bottom: 80px;
@@ -107,12 +107,12 @@
             transition: all 0.3s ease;
         }
 
-        /* Bouton de déclenchement */
+        /* Trigger button */
         #widget-toggle {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            background-color: #b04680; /* Rose */
+            background-color: #b04680; /* Pink */
             color: white;
             border: none;
             width: 60px;
@@ -128,12 +128,34 @@
         }
 
         #widget-toggle:hover {
-            background-color: #9a3f6e; /* Rose foncé */
+            background-color: #9a3f6e; /* Dark pink */
             transform: scale(1.1);
         }
     </style>
-    <!-- Script ElevenLabs -->
-    <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://www.google.com/jsapi"></script>
+    <script>
+        google.load('speech', '1', {callback: function() {
+            var recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            $('#send-button').click(function() {
+                recognition.start();
+            });
+
+            recognition.onresult = function(event) {
+                var last = event.results.length - 1;
+                var transcript = event.results[last][0].transcript;
+                $('#message-input').val(transcript);
+                sendMessage();
+            };
+
+            recognition.onerror = function(event) {
+                console.log('Error occurred in recognition: ' + event.error);
+            };
+        }});
+    </script>
 </head>
 <body>
     <div class="chat-container">
@@ -143,7 +165,7 @@
         <div class="chat-messages" id="chat-messages"></div>
         <div class="input-container">
             <input type="text" id="message-input" placeholder="Tapez votre message...">
-            <button id="send-button" onclick="sendMessage()">Envoyer</button>
+            <button id="send-button">Envoyer</button>
         </div>
     </div>
 
@@ -152,13 +174,13 @@
         <elevenlabs-convai agent-id="9zIrMUlk1wRddGqLC9zz"></elevenlabs-convai>
     </div>
 
-    <!-- Bouton de contrôle -->
+    <!-- Toggle button -->
     <button id="widget-toggle" onclick="toggleWidget()">🎙️</button>
 
     <script>
         const chatMessages = document.getElementById('chat-messages');
         const messageInput = document.getElementById('message-input');
-        const N8N_WEBHOOK_URL = 'https://llprod.app.n8n.cloud/webhook/chat-demo'; // Remplacer par votre URL
+        const N8N_WEBHOOK_URL = 'https://llprod.app.n8n.cloud/webhook/chat-demo'; // Replace with your URL
 
         async function sendMessageToN8N(message) {
             try {
@@ -186,16 +208,16 @@
             if (message) {
                 addMessage(message, true);
                 messageInput.value = '';
-                // Afficher le sablier d'attente
+                // Show loading spinner
                 const loadingMessageElement = document.createElement('div');
                 loadingMessageElement.classList.add('message', 'bot-message');
                 loadingMessageElement.innerHTML = '⌛';
                 chatMessages.appendChild(loadingMessageElement);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
-                // Appel à n8n
+                // Call to n8n
                 const botResponse = await sendMessageToN8N(message);
-                // Supprimer le sablier et afficher la réponse du bot
+                // Remove loading spinner and display bot response
                 chatMessages.removeChild(loadingMessageElement);
                 addMessage(botResponse, false);
             }
@@ -205,7 +227,7 @@
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
             messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-            messageDiv.innerHTML = message.replace(/\n/g, '<br>'); // Gérer les retours à la ligne
+            messageDiv.innerHTML = message.replace(/\n/g, '<br>'); // Handle line breaks
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
