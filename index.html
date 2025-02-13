@@ -83,7 +83,7 @@
             font-size: 1em;
         }
 
-        #send-button {
+        #send-button, #voice-button {
             margin-left: 10px;
             padding: 15px;
             background-color: #b04680; /* Rose */
@@ -94,7 +94,7 @@
             font-size: 1em;
         }
 
-        #send-button:hover {
+        #send-button:hover, #voice-button:hover {
             background-color: #9a3f6e; /* Rose foncé */
         }
 
@@ -129,6 +129,7 @@
         <div class="input-container">
             <input type="text" id="message-input" placeholder="Tapez votre message...">
             <button id="send-button" onclick="sendMessage()">Envoyer</button>
+            <button id="voice-button" onclick="toggleVoice()">🎤</button>
         </div>
     </div>
 
@@ -136,7 +137,11 @@
         const chatMessages = document.getElementById('chat-messages');
         const messageInput = document.getElementById('message-input');
         const loadingIcon = document.getElementById('loading-icon');
+        const voiceButton = document.getElementById('voice-button');
         const N8N_WEBHOOK_URL = 'https://llprod.app.n8n.cloud/webhook/chat-demo'; // Remplacer par votre URL
+
+        let recognition;
+        let isListening = false;
 
         async function sendMessageToN8N(message) {
             try {
@@ -172,6 +177,7 @@
                 // Appel à n8n
                 const botResponse = await sendMessageToN8N(message);
                 addMessage(botResponse, false);
+                speakResponse(botResponse);
 
                 // Cacher l'icône de chargement
                 loadingIcon.style.display = 'none';
@@ -194,6 +200,60 @@
         });
 
         addMessage("Bonjour ! Je suis Gwendy. Comment puis-je vous aider ?", false);
+
+        function toggleVoice() {
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        }
+
+        function startListening() {
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'fr-FR';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onresult = function(event) {
+                const message = event.results[0][0].transcript;
+                addMessage(message, true);
+                sendMessageToN8N(message).then(response => {
+                    addMessage(response, false);
+                    speakResponse(response);
+                });
+            };
+
+            recognition.onspeechend = function() {
+                recognition.stop();
+                isListening = false;
+                voiceButton.style.backgroundColor = '#b04680';
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Erreur de reconnaissance vocale:', event.error);
+                isListening = false;
+                voiceButton.style.backgroundColor = '#b04680';
+            };
+
+            recognition.start();
+            isListening = true;
+            voiceButton.style.backgroundColor = '#9a3f6e';
+        }
+
+        function stopListening() {
+            if (recognition) {
+                recognition.stop();
+                isListening = false;
+                voiceButton.style.backgroundColor = '#b04680';
+            }
+        }
+
+        function speakResponse(response) {
+            const utterance = new SpeechSynthesisUtterance(response);
+            utterance.lang = 'fr-FR';
+            window.speechSynthesis.speak(utterance);
+        }
     </script>
 </body>
 </html>
