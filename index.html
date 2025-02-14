@@ -16,7 +16,7 @@
 
         .chat-container {
             width: 95%;
-            height: 85%; /* Ajusté pour une hauteur de 12,5 cm */
+            height: 95%; /* Ajusté pour une hauteur de 12,5 cm */
             margin: auto;
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -92,14 +92,14 @@
             margin-top: 10px;
         }
 
-        #send-button, #voice-button, #shortcut-button {
-            padding: 20px; /* Augmenté pour des boutons plus grands */
+        #send-button, #voice-button, .shortcut-button {
+            padding: 20px 15px; /* Augmenté pour des boutons plus grands */
             border: none;
             border-radius: 25px; /* Coins arrondis */
             cursor: pointer;
             font-size: 1.2em; /* Augmenté pour une meilleure lisibilité */
             margin: 5px;
-            width: 45%;
+            width: 100%; /* Largeur complète pour les boutons de raccourci */
             text-align: center;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre pour un effet 3D */
         }
@@ -112,6 +112,11 @@
         #voice-button {
             background-color: #9a3f6e; /* Rose foncé */
             color: white;
+        }
+
+        .shortcut-button {
+            flex: 1;
+            margin: 5px;
         }
 
         #shortcut1 {
@@ -130,7 +135,7 @@
             background-color: #7b68ee; /* Bleu moyen */
         }
 
-        #send-button:hover, #voice-button:hover, #shortcut-button:hover {
+        #send-button:hover, #voice-button:hover, .shortcut-button:hover {
             opacity: 0.8;
         }
 
@@ -169,12 +174,12 @@
                 <button id="voice-button" onclick="toggleVoice()">🎤</button>
             </div>
             <div class="button-row">
-                <button id="shortcut1" onclick="insertText('Est-ce que j\'ai des emails ?')">Email</button>
-                <button id="shortcut2" onclick="insertText('Ajoute dans à voir plus tard')">Ajoute</button>
+                <button class="shortcut-button" id="shortcut1" onclick="insertText('Est-ce que j\'ai des emails ?')">Email</button>
+                <button class="shortcut-button" id="shortcut2" onclick="insertText('Ajoute dans à voir plus tard')">Ajoute</button>
             </div>
             <div class="button-row">
-                <button id="shortcut3" onclick="insertText('Rappelle-moi mes idées à voir plus tard')">Idées</button>
-                <button id="shortcut4" onclick="insertText('Donne-moi la météo pour Goussainville')">Météo</button>
+                <button class="shortcut-button" id="shortcut3" onclick="insertText('Rappelle-moi mes idées à voir plus tard')">Idées</button>
+                <button class="shortcut-button" id="shortcut4" onclick="insertText('Donne-moi la météo pour Goussainville')">Météo</button>
             </div>
         </div>
     </div>
