@@ -139,6 +139,7 @@
         const loadingIcon = document.getElementById('loading-icon');
         const voiceButton = document.getElementById('voice-button');
         const N8N_WEBHOOK_URL = 'https://llprod.app.n8n.cloud/webhook/chat-demo'; // Remplacer par votre URL
+        const GOOGLE_TTS_API_KEY = 'AIzaSyDfP2uIjDFRv78OB4RquhAKN0aSPjKqJ0c'; // Remplacez par votre clé API Google
 
         let recognition;
         let isListening = false;
@@ -177,7 +178,7 @@
                 // Appel à n8n
                 const botResponse = await sendMessageToN8N(message);
                 addMessage(botResponse, false);
-                speakResponse(botResponse);
+                textToSpeechGoogle(botResponse);
 
                 // Cacher l'icône de chargement
                 loadingIcon.style.display = 'none';
@@ -220,7 +221,7 @@
                 addMessage(message, true);
                 sendMessageToN8N(message).then(response => {
                     addMessage(response, false);
-                    speakResponse(response);
+                    textToSpeechGoogle(response);
                 });
             };
 
@@ -249,10 +250,30 @@
             }
         }
 
-        function speakResponse(response) {
-            const utterance = new SpeechSynthesisUtterance(response);
-            utterance.lang = 'fr-FR';
-            window.speechSynthesis.speak(utterance);
+        async function textToSpeechGoogle(text) {
+            const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${AIzaSyDfP2uIjDFRv78OB4RquhAKN0aSPjKqJ0c}`;
+            const body = {
+                input: { text: text },
+                voice: { languageCode: 'fr-FR', ssmlGender: 'FEMALE' },
+                audioConfig: { audioEncoding: 'MP3' }
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+                const audioContent = data.audioContent;
+                const audio = new Audio(`data:audio/mp3;base64,${audioContent}`);
+                audio.play();
+            } catch (error) {
+                console.error('Erreur lors de la synthèse vocale:', error);
+            }
         }
     </script>
 </body>
