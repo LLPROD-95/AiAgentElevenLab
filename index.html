@@ -16,7 +16,7 @@
 
         .chat-container {
             width: 95%;
-            height: 90%;
+            height: 75%;
             margin: auto;
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -68,6 +68,7 @@
 
         .input-container {
             display: flex;
+            flex-wrap: wrap;
             padding: 15px;
             background-color: #fff;
             border-top: 1px solid #ccc;
@@ -81,21 +82,55 @@
             border: 1px solid #ccc;
             border-radius: 20px;
             font-size: 1em;
+            width: calc(100% - 120px);
         }
 
-        #send-button, #voice-button {
-            margin-left: 10px;
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        #send-button, #voice-button, #shortcut-button {
             padding: 15px;
-            background-color: #b04680; /* Rose */
-            color: white;
             border: none;
             border-radius: 20px;
             cursor: pointer;
             font-size: 1em;
+            margin: 5px;
+            width: 45%;
+            text-align: center;
         }
 
-        #send-button:hover, #voice-button:hover {
+        #send-button {
+            background-color: #b04680; /* Rose */
+            color: white;
+        }
+
+        #voice-button {
             background-color: #9a3f6e; /* Rose foncé */
+            color: white;
+        }
+
+        #shortcut1 {
+            background-color: #ff69b4; /* Rose vif */
+        }
+
+        #shortcut2 {
+            background-color: #ba55d3; /* Orchidée moyenne */
+        }
+
+        #shortcut3 {
+            background-color: #8a2be2; /* Bleu violet */
+        }
+
+        #shortcut4 {
+            background-color: #7b68ee; /* Bleu moyen */
+        }
+
+        #send-button:hover, #voice-button:hover, #shortcut-button:hover {
+            opacity: 0.8;
         }
 
         /* Style pour l'icône de chargement */
@@ -128,8 +163,18 @@
         </div>
         <div class="input-container">
             <input type="text" id="message-input" placeholder="Tapez votre message...">
-            <button id="send-button" onclick="sendMessage()">Envoyer</button>
-            <button id="voice-button" onclick="toggleVoice()">🎤</button>
+            <div class="button-row">
+                <button id="send-button" onclick="sendMessage()">Envoyer</button>
+                <button id="voice-button" onclick="toggleVoice()">🎤</button>
+            </div>
+            <div class="button-row">
+                <button id="shortcut1" onclick="insertText('Est-ce que j\'ai des emails ?')">Email</button>
+                <button id="shortcut2" onclick="insertText('Ajoute dans à voir plus tard')">Ajoute</button>
+            </div>
+            <div class="button-row">
+                <button id="shortcut3" onclick="insertText('Rappelle-moi mes idées à voir plus tard')">Idées</button>
+                <button id="shortcut4" onclick="insertText('Donne-moi la météo pour Goussainville')">Météo</button>
+            </div>
         </div>
     </div>
 
@@ -192,6 +237,10 @@
             messageDiv.innerHTML = message.replace(/\n/g, '<br>'); // Gérer les retours à la ligne
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function insertText(text) {
+            messageInput.value = text;
         }
 
         messageInput.addEventListener('keypress', function(e) {
