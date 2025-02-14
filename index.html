@@ -1,335 +1,364 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gwendy</title>
-    <style>
-        /* Styles pour le chat */
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-        }
+  <meta charset="UTF-8">
+  <meta name="description" content="Chat interactif Gwendy - Un assistant virtuel pour répondre à vos questions et exécuter des commandes vocales et textuelles.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gwendy - Chat interactif</title>
+  <style>
+    /* Réinitialisation de quelques styles */
+    * {
+      box-sizing: border-box;
+    }
 
-        .chat-container {
-            width: 95%;
-            height: 98%; /* Ajusté pour une hauteur de 12,5 cm */
-            margin: auto;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background-color: #fff;
-        }
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
 
-        .chat-header {
-            background-color: #b04680; /* Rose */
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2em;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-        }
+    /* Conteneur principal du chat */
+    .chat-container {
+      /* Largeur max et centrage */
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      
+      /* Pour prendre toute la hauteur de la fenêtre */
+      height: 100vh;
+      
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: #fff;
+    }
 
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            border-bottom: 1px solid #ccc;
-            background-color: #f9f9f9;
-            position: relative;
-        }
+    /* En-tête du chat */
+    header.chat-header {
+      background-color: #b04680;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.3em;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .message {
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 1em;
-            line-height: 1.4em;
-        }
+    header.chat-header img {
+      max-height: 50px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
 
-        .user-message {
-            background-color: #ffccf9; /* Rose clair */
-            text-align: right;
-            align-self: flex-end;
-        }
+    /* Zone des messages */
+    main.chat-messages {
+      flex: 1; /* Pour occuper tout l’espace restant */
+      overflow-y: auto;
+      padding: 15px;
+      background-color: #fdfdfd;
+      position: relative;
+    }
 
-        .bot-message {
-            background-color: #e6e6ff; /* Violet clair */
-            text-align: left;
-            align-self: flex-start;
-        }
+    .message {
+      margin: 10px 0;
+      padding: 12px 15px;
+      border-radius: 10px;
+      font-size: 1em;
+      line-height: 1.4;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
 
-        .input-container {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 15px;
-            background-color: #fff;
-            border-top: 1px solid #ccc;
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-        }
+    .user-message {
+      background-color: #ffccf9;
+      align-self: flex-end;
+      text-align: right;
+    }
 
-        #message-input {
-            flex: 1;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            font-size: 1em;
-            width: calc(100% - 120px);
-        }
+    .bot-message {
+      background-color: #e6e6ff;
+      align-self: flex-start;
+      text-align: left;
+    }
 
-        .button-row {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 10px;
-        }
+    /* Zone de saisie et boutons */
+    .input-container {
+      padding: 15px;
+      background-color: #fff;
+      border-top: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+    }
 
-        #send-button, #voice-button, .shortcut-button {
-            padding: 15px 15px; /* Augmenté pour des boutons plus grands */
-            border: none;
-            border-radius: 25px; /* Coins arrondis */
-            cursor: pointer;
-            font-size: 1.2em; /* Augmenté pour une meilleure lisibilité */
-            margin: 5px;
-            width: 80%; /* Largeur complète pour les boutons de raccourci */
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre pour un effet 3D */
-        }
+    #message-input {
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      font-size: 1em;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.3s;
+      margin-bottom: 10px;
+    }
 
-        #send-button {
-            background-color: #b04680; /* Rose */
-            color: white;
-        }
+    #message-input:focus {
+      border-color: #b04680;
+    }
 
-        #voice-button {
-            background-color: #9a3f6e; /* Rose foncé */
-            color: white;
-        }
+    .button-row {
+      /* Ajout d'un espace uniforme entre les boutons */
+      display: flex;
+      gap: 10px; /* Espace horizontal entre boutons */
+      flex-wrap: wrap; 
+      margin-bottom: 10px;
+    }
 
-        .shortcut-button {
-            flex: 1;
-            margin: 5px;
-        }
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: opacity 0.3s, transform 0.3s;
+    }
 
-        #shortcut1 {
-            background-color: #ff69b4; /* Rose vif */
-        }
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
 
-        #shortcut2 {
-            background-color: #ba55d3; /* Orchidée moyenne */
-        }
+    #send-button {
+      background-color: #b04680;
+      color: #fff;
+    }
 
-        #shortcut3 {
-            background-color: #8a2be2; /* Bleu violet */
-        }
+    #voice-button {
+      background-color: #9a3f6e;
+      color: #fff;
+    }
 
-        #shortcut4 {
-            background-color: #7b68ee; /* Bleu moyen */
-        }
+    .shortcut-button {
+      background-color: #ccc;
+    }
 
-        #send-button:hover, #voice-button:hover, .shortcut-button:hover {
-            opacity: 0.8;
-        }
+    #shortcut1 { background-color: #ff69b4; }
+    #shortcut2 { background-color: #ba55d3; }
+    #shortcut3 { background-color: #8a2be2; }
+    #shortcut4 { background-color: #7b68ee; }
 
-        /* Style pour l'icône de chargement */
-        .loading-icon {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #b04680; /* Rose */
-            border-top: 3px solid #fff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: none;
-        }
+    /* Icône de chargement */
+    .loading-icon {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      width: 24px;
+      height: 24px;
+      border: 3px solid #b04680;
+      border-top: 3px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      header.chat-header {
+        flex-direction: column;
+      }
+
+      header.chat-header img {
+        margin-bottom: 5px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <img src="https://github.com/LLPROD-95/AiAgentElevenLab/blob/image/gwendi2.jpg" alt="Gwendy">
-        </div>
-        <div class="chat-messages" id="chat-messages">
-            <div class="loading-icon" id="loading-icon"></div>
-        </div>
-        <div class="input-container">
-            <input type="text" id="message-input" placeholder="Tapez votre message...">
-            <div class="button-row">
-                <button id="send-button" onclick="sendMessage()">Envoyer</button>
-                <button id="voice-button" onclick="toggleVoice()">🎤</button>
-            </div>
-            <div class="button-row">
-                <button class="shortcut-button" id="shortcut1" onclick="insertText('Est-ce que j\'ai des emails ?')">Email</button>
-                <button class="shortcut-button" id="shortcut2" onclick="insertText('Ajoute dans à voir plus tard')">Ajoute</button>
-            </div>
-            <div class="button-row">
-                <button class="shortcut-button" id="shortcut3" onclick="insertText('Rappelle-moi mes idées à voir plus tard')">Idées</button>
-                <button class="shortcut-button" id="shortcut4" onclick="insertText('Donne-moi la météo pour Goussainville')">Météo</button>
-            </div>
-        </div>
+  <div class="chat-container">
+    <header class="chat-header">
+      <img src="https://github.com/LLPROD-95/AiAgentElevenLab/blob/image/gwendi2.jpg?raw=true" alt="Portrait de Gwendy">
+      <span>Gwendy</span>
+    </header>
+    
+    <main class="chat-messages" id="chat-messages" aria-live="polite">
+      <div class="loading-icon" id="loading-icon" aria-hidden="true"></div>
+    </main>
+    
+    <div class="input-container">
+      <input type="text" id="message-input" placeholder="Tapez votre message..." aria-label="Saisissez votre message">
+      
+      <div class="button-row">
+        <button id="send-button" onclick="sendMessage()" aria-label="Envoyer le message">Envoyer</button>
+        <button id="voice-button" onclick="toggleVoice()" aria-label="Commande vocale">🎤</button>
+      </div>
+      
+      <div class="button-row">
+        <button class="shortcut-button" id="shortcut1" onclick="insertText('Est-ce que j\'ai des emails ?')" aria-label="Vérifier mes emails">Email</button>
+        <button class="shortcut-button" id="shortcut2" onclick="insertText('Ajoute dans à voir plus tard')" aria-label="Ajouter à la liste">Ajoute</button>
+      </div>
+      
+      <div class="button-row">
+        <button class="shortcut-button" id="shortcut3" onclick="insertText('Rappelle-moi mes idées à voir plus tard')" aria-label="Mes idées">Idées</button>
+        <button class="shortcut-button" id="shortcut4" onclick="insertText('Donne-moi la météo pour Goussainville')" aria-label="Météo">Météo</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        const chatMessages = document.getElementById('chat-messages');
-        const messageInput = document.getElementById('message-input');
-        const loadingIcon = document.getElementById('loading-icon');
-        const voiceButton = document.getElementById('voice-button');
-        const N8N_WEBHOOK_URL = 'https://llprod.app.n8n.cloud/webhook/chat-demo'; // Remplacer par votre URL
-        const GOOGLE_TTS_API_KEY = 'AIzaSyDfP2uIjDFRv78OB4RquhAKN0aSPjKqJ0c'; // Remplacez par votre clé API Google
+  <script>
+    // Sélection des éléments
+    const chatMessages = document.getElementById('chat-messages');
+    const messageInput = document.getElementById('message-input');
+    const loadingIcon = document.getElementById('loading-icon');
+    const voiceButton = document.getElementById('voice-button');
 
-        let recognition;
-        let isListening = false;
+    // URL du webhook et clé API (à remplacer par les vôtres)
+    const N8N_WEBHOOK_URL = 'https://llprod.app.n8n.cloud/webhook/chat-demo';
+    const GOOGLE_TTS_API_KEY = 'AIzaSyDfP2uIjDFRv78OB4RquhAKN0aSPjKqJ0c';
 
-        async function sendMessageToN8N(message) {
-            try {
-                const response = await fetch(N8N_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        timestamp: new Date().toISOString()
-                    })
-                });
+    let recognition;
+    let isListening = false;
 
-                const data = await response.json();
-                return data.response;
-            } catch (error) {
-                console.error('Erreur:', error);
-                return "Désolé, le service est indisponible pour le moment.";
-            }
-        }
-
-        async function sendMessage() {
-            const message = messageInput.value.trim();
-
-            if (message) {
-                addMessage(message, true);
-                messageInput.value = '';
-
-                // Afficher l'icône de chargement
-                loadingIcon.style.display = 'block';
-
-                // Appel à n8n
-                const botResponse = await sendMessageToN8N(message);
-                addMessage(botResponse, false);
-                textToSpeechGoogle(botResponse);
-
-                // Cacher l'icône de chargement
-                loadingIcon.style.display = 'none';
-            }
-        }
-
-        function addMessage(message, isUser) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-            messageDiv.innerHTML = message.replace(/\n/g, '<br>'); // Gérer les retours à la ligne
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function insertText(text) {
-            messageInput.value = text;
-        }
-
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+    // Fonction d'envoi de message au service n8n
+    async function sendMessageToN8N(message) {
+      try {
+        const response = await fetch(N8N_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, timestamp: new Date().toISOString() })
         });
+        const data = await response.json();
+        return data.response;
+      } catch (error) {
+        console.error('Erreur:', error);
+        return "Désolé, le service est indisponible pour le moment.";
+      }
+    }
 
-        addMessage("Bonjour ! Je suis Gwendy. Comment puis-je vous aider ?", false);
+    // Fonction d'envoi du message utilisateur
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+      
+      addMessage(message, true);
+      messageInput.value = '';
+      loadingIcon.style.display = 'block';
 
-        function toggleVoice() {
-            if (isListening) {
-                stopListening();
-            } else {
-                startListening();
-            }
-        }
+      const botResponse = await sendMessageToN8N(message);
+      addMessage(botResponse, false);
+      textToSpeechGoogle(botResponse);
+      
+      loadingIcon.style.display = 'none';
+    }
 
-        function startListening() {
-            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'fr-FR';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+    // Ajout d'un message dans la conversation
+    function addMessage(message, isUser) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+      messageDiv.innerHTML = message.replace(/\n/g, '<br>');
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
-            recognition.onresult = function(event) {
-                const message = event.results[0][0].transcript;
-                addMessage(message, true);
-                sendMessageToN8N(message).then(response => {
-                    addMessage(response, false);
-                    textToSpeechGoogle(response);
-                });
-            };
+    // Insérer un texte prédéfini dans le champ de saisie
+    function insertText(text) {
+      messageInput.value = text;
+      messageInput.focus();
+    }
 
-            recognition.onspeechend = function() {
-                recognition.stop();
-                isListening = false;
-                voiceButton.style.backgroundColor = '#b04680';
-            };
+    // Envoi du message en appuyant sur "Entrée"
+    messageInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
 
-            recognition.onerror = function(event) {
-                console.error('Erreur de reconnaissance vocale:', event.error);
-                isListening = false;
-                voiceButton.style.backgroundColor = '#b04680';
-            };
+    // Message de bienvenue
+    addMessage("Bonjour ! Je suis Gwendy. Comment puis-je vous aider ?", false);
 
-            recognition.start();
-            isListening = true;
-            voiceButton.style.backgroundColor = '#9a3f6e';
-        }
+    // Gestion de la reconnaissance vocale
+    function toggleVoice() {
+      isListening ? stopListening() : startListening();
+    }
 
-        function stopListening() {
-            if (recognition) {
-                recognition.stop();
-                isListening = false;
-                voiceButton.style.backgroundColor = '#b04680';
-            }
-        }
+    function startListening() {
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'fr-FR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
 
-        async function textToSpeechGoogle(text) {
-            const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_API_KEY}`;
-            const body = {
-                input: { text: text },
-                voice: { languageCode: 'fr-FR', ssmlGender: 'FEMALE' },
-                audioConfig: { audioEncoding: 'MP3' }
-            };
+      recognition.onresult = function(event) {
+        const message = event.results[0][0].transcript;
+        addMessage(message, true);
+        sendMessageToN8N(message).then(response => {
+          addMessage(response, false);
+          textToSpeechGoogle(response);
+        });
+      };
 
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8'
-                    },
-                    body: JSON.stringify(body)
-                });
+      recognition.onspeechend = function() {
+        recognition.stop();
+        isListening = false;
+        voiceButton.style.backgroundColor = '#b04680';
+      };
 
-                const data = await response.json();
-                const audioContent = data.audioContent;
-                const audio = new Audio(`data:audio/mp3;base64,${audioContent}`);
-                audio.play();
-            } catch (error) {
-                console.error('Erreur lors de la synthèse vocale:', error);
-            }
-        }
-    </script>
+      recognition.onerror = function(event) {
+        console.error('Erreur de reconnaissance vocale:', event.error);
+        isListening = false;
+        voiceButton.style.backgroundColor = '#b04680';
+      };
+
+      recognition.start();
+      isListening = true;
+      voiceButton.style.backgroundColor = '#9a3f6e';
+    }
+
+    function stopListening() {
+      if (recognition) {
+        recognition.stop();
+        isListening = false;
+        voiceButton.style.backgroundColor = '#b04680';
+      }
+    }
+
+    // Synthèse vocale via l'API Google TTS
+    async function textToSpeechGoogle(text) {
+      const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_API_KEY}`;
+      const body = {
+        input: { text },
+        voice: { languageCode: 'fr-FR', ssmlGender: 'FEMALE' },
+        audioConfig: { audioEncoding: 'MP3' }
+      };
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json; charset=utf-8' },
+          body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        const audioContent = data.audioContent;
+        const audio = new Audio(`data:audio/mp3;base64,${audioContent}`);
+        audio.play();
+      } catch (error) {
+        console.error('Erreur lors de la synthèse vocale:', error);
+      }
+    }
+  </script>
 </body>
 </html>
