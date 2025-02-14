@@ -251,7 +251,7 @@
         }
 
         async function textToSpeechGoogle(text) {
-            const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${AIzaSyDfP2uIjDFRv78OB4RquhAKN0aSPjKqJ0c}`;
+            const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_API_KEY}`;
             const body = {
                 input: { text: text },
                 voice: { languageCode: 'fr-FR', ssmlGender: 'FEMALE' },
