@@ -22,14 +22,10 @@
 
     /* Conteneur principal du chat */
     .chat-container {
-      /* Largeur max et centrage */
       width: 100%;
       max-width: 600px;
       margin: 0 auto;
-      
-      /* Pour prendre toute la hauteur de la fenêtre */
-      height: 100vh;
-      
+      height: 100vh; /* Pour prendre toute la hauteur de la fenêtre */
       border: 1px solid #ccc;
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
@@ -117,7 +113,6 @@
     }
 
     .button-row {
-      /* Ajout d'un espace uniforme entre les boutons */
       display: flex;
       gap: 10px; /* Espace horizontal entre boutons */
       flex-wrap: wrap; 
@@ -203,9 +198,21 @@
     <div class="input-container">
       <input type="text" id="message-input" placeholder="Tapez votre message..." aria-label="Saisissez votre message">
       
+      <!-- Input caché pour la capture ou sélection d'image -->
+      <input 
+        type="file" 
+        id="photo-input" 
+        accept="image/*" 
+        capture="camera" 
+        style="display:none" 
+        aria-label="Choisir ou prendre une photo"
+      />
+      
       <div class="button-row">
         <button id="send-button" onclick="sendMessage()" aria-label="Envoyer le message">Envoyer</button>
         <button id="voice-button" onclick="toggleVoice()" aria-label="Commande vocale">🎤</button>
+        <!-- Nouveau bouton Photo -->
+        <button id="photo-button" onclick="openCamera()" aria-label="Prendre une photo">📷</button>
       </div>
       
       <div class="button-row">
@@ -226,6 +233,7 @@
     const messageInput = document.getElementById('message-input');
     const loadingIcon = document.getElementById('loading-icon');
     const voiceButton = document.getElementById('voice-button');
+    const photoInput = document.getElementById('photo-input');
 
     // URL du webhook et clé API (à remplacer par les vôtres)
     const N8N_WEBHOOK_URL = 'https://llprod.app.n8n.cloud/webhook/chat-demo';
@@ -234,7 +242,8 @@
     let recognition;
     let isListening = false;
 
-    // Fonction d'envoi de message au service n8n
+    // === FONCTIONS D'ENVOI DE MESSAGES TEXTUELS ===
+
     async function sendMessageToN8N(message) {
       try {
         const response = await fetch(N8N_WEBHOOK_URL, {
@@ -250,7 +259,6 @@
       }
     }
 
-    // Fonction d'envoi du message utilisateur
     async function sendMessage() {
       const message = messageInput.value.trim();
       if (!message) return;
@@ -266,7 +274,7 @@
       loadingIcon.style.display = 'none';
     }
 
-    // Ajout d'un message dans la conversation
+    // Afficher un message dans la zone de chat
     function addMessage(message, isUser) {
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
@@ -281,7 +289,7 @@
       messageInput.focus();
     }
 
-    // Envoi du message en appuyant sur "Entrée"
+    // Envoyer le message en appuyant sur "Entrée"
     messageInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         sendMessage();
@@ -291,7 +299,7 @@
     // Message de bienvenue
     addMessage("Bonjour ! Je suis Gwendy. Comment puis-je vous aider ?", false);
 
-    // Gestion de la reconnaissance vocale
+    // === RECONNAISSANCE VOCALE ===
     function toggleVoice() {
       isListening ? stopListening() : startListening();
     }
@@ -336,7 +344,7 @@
       }
     }
 
-    // Synthèse vocale via l'API Google TTS
+    // === SYNTHÈSE VOCALE GOOGLE TTS ===
     async function textToSpeechGoogle(text) {
       const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_API_KEY}`;
       const body = {
@@ -359,6 +367,57 @@
         console.error('Erreur lors de la synthèse vocale:', error);
       }
     }
+
+    // === GESTION DE LA PRISE DE PHOTO / ENVOI D'IMAGE ===
+    function openCamera() {
+      // Déclenche l'ouverture de l'appareil photo ou de la galerie (selon l'appareil)
+      photoInput.click();
+    }
+
+    // Écoute l'événement "change" pour l'input photo
+    photoInput.addEventListener('change', async function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // Lecture du fichier en base64
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          const base64Data = e.target.result; // Données en base64
+          
+          // Optionnel : afficher un petit message dans le chat
+          addMessage("Photo en cours d'envoi...", true);
+          loadingIcon.style.display = 'block';
+
+          try {
+            // Envoi des données en base64 à n8n
+            const response = await fetch(N8N_WEBHOOK_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                image: base64Data,
+                timestamp: new Date().toISOString()
+              })
+            });
+
+            const data = await response.json();
+            loadingIcon.style.display = 'none';
+
+            // Afficher un message dans le chat pour confirmer l’envoi
+            addMessage("Photo envoyée !", true);
+
+            // Si n8n renvoie un message, on l'affiche
+            if (data.response) {
+              addMessage(data.response, false);
+              textToSpeechGoogle(data.response);
+            }
+          } catch (err) {
+            loadingIcon.style.display = 'none';
+            addMessage("Erreur lors de l'envoi de la photo.", false);
+            console.error("Erreur envoi photo:", err);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
   </script>
 </body>
 </html>
