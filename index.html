@@ -339,12 +339,12 @@
       }
     }
 
-    // === Redimensionnement de l'image côté client ===
+    // === Redimensionnement de l'image côté client en Blob ===
     /**
-     * Redimensionne une image base64 pour qu'elle ne dépasse pas maxWidth x maxHeight.
-     * Retourne une promesse qui résout vers la nouvelle image base64 (format JPEG).
+     * Redimensionne une image à partir d'une DataURI pour qu'elle ne dépasse pas maxWidth x maxHeight.
+     * Retourne une promesse qui résout vers un Blob en format JPEG.
      */
-    function resizeImage(base64Str, maxWidth, maxHeight) {
+    function resizeImageToBlob(base64Str, maxWidth, maxHeight) {
       return new Promise((resolve, reject) => {
         const img = new Image();
         img.onerror = reject;
@@ -371,9 +371,14 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Qualité de compression (0.8 = 80%)
-          const newBase64 = canvas.toDataURL('image/jpeg', 0.8);
-          resolve(newBase64);
+          // Convertir le canvas en Blob (format JPEG, qualité 80%)
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error("Erreur lors de la création du Blob"));
+            }
+          }, 'image/jpeg', 0.8);
         };
         img.src = base64Str;
       });
@@ -388,35 +393,33 @@
       const file = event.target.files[0];
       if (!file) return;
 
-      // Lecture du fichier en base64
+      // Lecture du fichier en DataURI (pour alimenter l'image dans le canvas)
       const reader = new FileReader();
       reader.onload = async function(e) {
-        const originalBase64 = e.target.result; // Données en base64
+        const originalBase64 = e.target.result; // DataURI de l'image
         
-        // Affiche un message dans le chat
-        // addMessage("Photo en cours de redimensionnement...", true);
         loadingIcon.style.display = 'block';
 
         try {
-          // Redimensionner l'image avant l'envoi
-          // Ex: on limite à 800x800 pixels max
-          const resizedBase64 = await resizeImage(originalBase64, 800, 800);
+          // Redimensionner l'image et obtenir un Blob JPEG
+          const imageBlob = await resizeImageToBlob(originalBase64, 800, 800);
 
-          // Envoi de l'image redimensionnée à n8n
+          // Préparer un FormData pour envoyer le fichier
+          const formData = new FormData();
+          formData.append('image', imageBlob, file.name); // Conserve le nom d'origine
+          formData.append('timestamp', new Date().toISOString());
+
+          // Envoi du FormData à n8n
           const response = await fetch(N8N_WEBHOOK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              image: resizedBase64,
-              timestamp: new Date().toISOString()
-            })
+            body: formData
           });
 
           const data = await response.json();
           loadingIcon.style.display = 'none';
 
           // Afficher un message dans le chat pour confirmer l’envoi
-          // addMessage("Photo envoyée (redimensionnée) !", true);
+          addMessage("Photo envoyée (redimensionnée en JPEG) !", true);
 
           // Si n8n renvoie un message, on l’affiche
           if (data.response) {
