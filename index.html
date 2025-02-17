@@ -394,7 +394,7 @@
         const originalBase64 = e.target.result; // Données en base64
         
         // Affiche un message dans le chat
-        addMessage("Photo en cours de redimensionnement...", true);
+        // addMessage("Photo en cours de redimensionnement...", true);
         loadingIcon.style.display = 'block';
 
         try {
@@ -416,7 +416,7 @@
           loadingIcon.style.display = 'none';
 
           // Afficher un message dans le chat pour confirmer l’envoi
-          addMessage("Photo envoyée (redimensionnée) !", true);
+          // addMessage("Photo envoyée (redimensionnée) !", true);
 
           // Si n8n renvoie un message, on l’affiche
           if (data.response) {
